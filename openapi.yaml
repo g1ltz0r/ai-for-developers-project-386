@@ -1,0 +1,452 @@
+openapi: 3.0.0
+info:
+  title: Calendar Booking API
+  description: |-
+    Calendar Booking API — бронирование слотов без авторизации.
+
+    Две роли, различаются только набором доступных операций (без регистрации/аутентификации):
+
+    - **Гость** (тег `Guest`): просмотр типов событий, свободные слоты, создание брони.
+    - **Владелец** (тег `Owner`, маршруты `/admin`): управление типами событий, список предстоящих встреч, отмена броней.
+  version: 1.0.0
+tags:
+  - name: Guest
+  - name: Owner
+paths:
+  /admin/bookings:
+    get:
+      operationId: OwnerBookingsApi_list
+      description: 'Владелец: предстоящие встречи (start_time в будущем), по возрастанию времени, keyset-пагинация. Cursor отражает срез на момент запроса; при конкурентных изменениях возможны дубли/пропуски.'
+      parameters:
+        - $ref: '#/components/parameters/BookingListParams.limit'
+        - $ref: '#/components/parameters/BookingListParams.cursor'
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BookingPage'
+        '400':
+          description: The server could not understand the request due to invalid syntax.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationBody'
+      tags:
+        - Owner
+  /admin/bookings/{id}:
+    delete:
+      operationId: OwnerBookingsApi_cancel
+      description: 'Владелец: отмена брони; освободившийся слот возвращается в доступные.'
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/Uuid'
+      responses:
+        '204':
+          description: 'There is no content to send for this request, but the headers may be useful. '
+        '404':
+          description: The server cannot find the requested resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+      tags:
+        - Owner
+  /event-types:
+    get:
+      operationId: PublicEventTypesApi_list
+      description: 'Гость: список типов событий, упорядочен по дате создания (created_at) по возрастанию. Тот же список используется в админке владельца.'
+      parameters: []
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/EventType'
+      tags:
+        - Guest
+    post:
+      operationId: OwnerEventTypesApi_create
+      description: 'Владелец: создать тип события.'
+      parameters: []
+      responses:
+        '201':
+          description: The request has succeeded and a new resource has been created as a result.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EventType'
+        '400':
+          description: The server could not understand the request due to invalid syntax.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationBody'
+      tags:
+        - Owner
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EventTypeCreate'
+  /event-types/{id}:
+    patch:
+      operationId: OwnerEventTypesApi_update
+      description: 'Владелец: изменить тип события. Правка длительности не влияет на существующие брони (снимок в брони).'
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/Uuid'
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EventType'
+        '400':
+          description: The server could not understand the request due to invalid syntax.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationBody'
+        '404':
+          description: The server cannot find the requested resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+      tags:
+        - Owner
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EventTypeUpdate'
+    delete:
+      operationId: OwnerEventTypesApi_delete
+      description: 'Владелец: удалить тип события. 409, если есть брони.'
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/Uuid'
+      responses:
+        '204':
+          description: 'There is no content to send for this request, but the headers may be useful. '
+        '404':
+          description: The server cannot find the requested resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '409':
+          description: The request conflicts with the current state of the server.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+      tags:
+        - Owner
+  /event-types/{id}/book:
+    post:
+      operationId: PublicBookingApi_book
+      description: 'Гость: создать бронь. start_time — старт свободного слота из /slots, иначе 400; конкурентная занятость слота — 409. end_time рассчитывается от текущей длительности типа (снимок на момент брони).'
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/Uuid'
+      responses:
+        '201':
+          description: The request has succeeded and a new resource has been created as a result.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BookingConfirmation'
+        '400':
+          description: The server could not understand the request due to invalid syntax.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationBody'
+        '404':
+          description: The server cannot find the requested resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '409':
+          description: The request conflicts with the current state of the server.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+      tags:
+        - Guest
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BookingCreate'
+  /event-types/{id}/slots:
+    get:
+      operationId: PublicEventTypesApi_slots
+      description: 'Гость: свободные слоты на окно [сегодня, сегодня+14) в TZ зрителя. tz — IANA-идентификатор; сетка стартов :00/:15/:30/:45; конец слота может выходить за окно.'
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/Uuid'
+        - name: tz
+          in: query
+          required: true
+          description: IANA-идентификатор часового пояса зрителя, например Europe/Moscow.
+          schema:
+            type: string
+          explode: false
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SlotsResponse'
+        '400':
+          description: The server could not understand the request due to invalid syntax.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationBody'
+        '404':
+          description: The server cannot find the requested resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+      tags:
+        - Guest
+components:
+  parameters:
+    BookingListParams.cursor:
+      name: cursor
+      in: query
+      required: false
+      schema:
+        type: string
+      explode: false
+    BookingListParams.limit:
+      name: limit
+      in: query
+      required: false
+      schema:
+        type: integer
+        format: int32
+        minimum: 1
+        maximum: 100
+        default: 50
+      explode: false
+  schemas:
+    AdminBooking:
+      type: object
+      required:
+        - event_type_title
+      properties:
+        event_type_title:
+          type: string
+      allOf:
+        - $ref: '#/components/schemas/Booking'
+    ApiVersions:
+      type: string
+      enum:
+        - 1.0.0
+    Booking:
+      type: object
+      required:
+        - id
+        - event_type_id
+        - start_time
+        - end_time
+        - duration_minutes
+        - guest_name
+        - guest_email
+      properties:
+        id:
+          $ref: '#/components/schemas/Uuid'
+        event_type_id:
+          $ref: '#/components/schemas/Uuid'
+        start_time:
+          type: string
+          format: date-time
+        end_time:
+          type: string
+          format: date-time
+        duration_minutes:
+          type: integer
+          format: int32
+        guest_name:
+          type: string
+          minLength: 1
+        guest_email:
+          type: string
+          format: email
+    BookingConfirmation:
+      type: object
+      required:
+        - event_type_title
+      properties:
+        event_type_title:
+          type: string
+      allOf:
+        - $ref: '#/components/schemas/Booking'
+    BookingCreate:
+      type: object
+      required:
+        - guest_name
+        - guest_email
+        - start_time
+      properties:
+        guest_name:
+          type: string
+          minLength: 1
+        guest_email:
+          type: string
+          format: email
+        start_time:
+          type: string
+          format: date-time
+    BookingPage:
+      type: object
+      required:
+        - items
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/AdminBooking'
+        next_cursor:
+          type: string
+    ErrorBody:
+      type: object
+      required:
+        - message
+      properties:
+        message:
+          type: string
+    EventType:
+      type: object
+      required:
+        - id
+        - title
+        - description
+        - duration_minutes
+      properties:
+        id:
+          $ref: '#/components/schemas/Uuid'
+        title:
+          type: string
+          minLength: 1
+        description:
+          type: string
+          nullable: true
+        duration_minutes:
+          type: integer
+          format: int32
+          minimum: 1
+    EventTypeCreate:
+      type: object
+      required:
+        - title
+        - duration_minutes
+      properties:
+        title:
+          type: string
+          minLength: 1
+        description:
+          type: string
+        duration_minutes:
+          type: integer
+          format: int32
+          minimum: 1
+    EventTypeUpdate:
+      type: object
+      properties:
+        title:
+          type: string
+          minLength: 1
+        description:
+          type: string
+          nullable: true
+        duration_minutes:
+          type: integer
+          format: int32
+          minimum: 1
+    Slot:
+      type: object
+      required:
+        - start
+        - duration_minutes
+      properties:
+        start:
+          type: string
+          format: date-time
+        duration_minutes:
+          type: integer
+          format: int32
+    SlotsResponse:
+      type: object
+      required:
+        - window
+        - slots
+      properties:
+        window:
+          type: object
+          properties:
+            start:
+              type: string
+              format: date-time
+            end:
+              type: string
+              format: date-time
+          required:
+            - start
+            - end
+        slots:
+          type: array
+          items:
+            $ref: '#/components/schemas/Slot'
+    Uuid:
+      type: string
+      format: uuid
+    ValidationBody:
+      type: object
+      required:
+        - errors
+      properties:
+        errors:
+          type: object
+          additionalProperties:
+            type: array
+            items:
+              type: string
+      allOf:
+        - $ref: '#/components/schemas/ErrorBody'
+servers:
+  - url: /api
+    description: API v1
+    variables: {}
