@@ -1,0 +1,19 @@
+{
+  "packages": {
+    ".": {
+      "release-type": "node",
+      "changelog-sections": [
+        { "type": "feat", "section": "Features" },
+        { "type": "fix", "section": "Bug Fixes" },
+        { "type": "test", "section": "Tests" },
+        { "type": "ci", "section": "CI/CD" },
+        { "type": "docs", "section": "Documentation" },
+        { "type": "refactor", "section": "Refactors" },
+        { "type": "build", "section": "Build System" },
+        { "type": "chore", "section": "Chores" },
+        { "type": "style", "section": "Styles" }
+      ],
+      "include-v-in-tag": true
+    }
+  }
+}

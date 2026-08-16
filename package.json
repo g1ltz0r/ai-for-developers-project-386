@@ -1,0 +1,14 @@
+{
+  "name": "ai-for-developers-project-386",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test:e2e": "npm --prefix e2e run test",
+    "test:e2e:headed": "npm --prefix e2e run test:headed",
+    "test:e2e:ui": "npm --prefix e2e run test:ui"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  }
+}
