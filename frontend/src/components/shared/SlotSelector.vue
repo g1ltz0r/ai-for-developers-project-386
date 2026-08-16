@@ -126,6 +126,7 @@ function isSelected(slot: Slot) {
       <button
         class="rounded-md p-1 hover:bg-accent"
         :disabled="!selectedDate"
+        aria-label="Предыдущий день"
         @click="previousDate"
       >
         <ChevronLeft class="h-4 w-4" />
@@ -149,6 +150,7 @@ function isSelected(slot: Slot) {
       <button
         class="rounded-md p-1 hover:bg-accent"
         :disabled="!selectedDate"
+        aria-label="Следующий день"
         @click="nextDate"
       >
         <ChevronRight class="h-4 w-4" />

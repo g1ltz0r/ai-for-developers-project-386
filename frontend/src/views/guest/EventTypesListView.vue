@@ -33,7 +33,7 @@ const { data: eventTypes, isLoading, error } = useEventTypes()
     </div>
 
     <div v-else class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-      <Card v-for="eventType in eventTypes" :key="eventType.id">
+      <Card v-for="eventType in eventTypes" :key="eventType.id" data-testid="event-type-card">
         <CardHeader>
           <CardTitle>{{ eventType.title }}</CardTitle>
           <CardDescription v-if="eventType.description">

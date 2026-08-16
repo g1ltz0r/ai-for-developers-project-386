@@ -1,6 +1,15 @@
 <script setup lang="ts">
 import { cn } from '@/lib/utils'
 
+interface Props {
+  modelValue?: string
+}
+
+defineProps<Props>()
+const emit = defineEmits<{
+  'update:modelValue': [value: string]
+}>()
+
 defineOptions({
   inheritAttrs: false,
 })
@@ -8,6 +17,8 @@ defineOptions({
 
 <template>
   <textarea
+    :value="modelValue"
+    @input="emit('update:modelValue', ($event.target as HTMLTextAreaElement).value)"
     v-bind="$attrs"
     :class="
       cn(

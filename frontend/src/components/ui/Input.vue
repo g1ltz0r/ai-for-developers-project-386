@@ -1,13 +1,33 @@
 <script setup lang="ts">
 import { cn } from '@/lib/utils'
 
+interface Props {
+  modelValue?: string | number
+}
+
+defineProps<Props>()
+const emit = defineEmits<{
+  'update:modelValue': [value: string | number]
+}>()
+
 defineOptions({
   inheritAttrs: false,
 })
+
+function handleInput(event: Event) {
+  const target = event.target as HTMLInputElement
+  if (target.type === 'number') {
+    emit('update:modelValue', target.valueAsNumber)
+  } else {
+    emit('update:modelValue', target.value)
+  }
+}
 </script>
 
 <template>
   <input
+    :value="modelValue"
+    @input="handleInput"
     v-bind="$attrs"
     :class="
       cn(
