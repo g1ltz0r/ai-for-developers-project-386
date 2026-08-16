@@ -1,5 +1,18 @@
 # Changelog
 
+## [0.2.0](https://github.com/g1ltz0r/ai-for-developers-project-386/compare/ai-for-developers-project-386-v0.1.1...ai-for-developers-project-386-v0.2.0) (2026-08-16)
+
+
+### Features
+
+* add Docker deployment with Laravel Octane and Railway setup ([911d5cd](https://github.com/g1ltz0r/ai-for-developers-project-386/commit/911d5cd1eeaaa759259aaf473f273cf7fdb0b78c))
+
+
+### Documentation
+
+* add deployment instructions and Railway placeholder ([1a657e1](https://github.com/g1ltz0r/ai-for-developers-project-386/commit/1a657e1357e7b776067c136163623ea4328ff517))
+* update README with Railway deployment URL ([e5baec4](https://github.com/g1ltz0r/ai-for-developers-project-386/commit/e5baec4834586b9c510d3fab4d25dd28b7e2533e))
+
 ## [0.1.1](https://github.com/g1ltz0r/ai-for-developers-project-386/compare/ai-for-developers-project-386-v0.1.0...ai-for-developers-project-386-v0.1.1) (2026-08-16)
 
 
