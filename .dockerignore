@@ -1,0 +1,42 @@
+.git
+.github
+e2e
+
+frontend/node_modules
+frontend/dist
+frontend/.env*
+
+backend/node_modules
+backend/vendor
+backend/storage/logs
+backend/storage/framework/cache
+backend/storage/framework/sessions
+backend/storage/framework/views
+backend/storage/framework/testing
+backend/storage/pail
+backend/storage/*.key
+backend/database/*.sqlite
+backend/database/*.sqlite-journal
+backend/.env
+backend/.env.backup
+backend/.env.production
+backend/.phpunit.result.cache
+backend/.phpactor.json
+backend/*.log
+
+# Local e2e SQLite database
+backend/database/e2e.sqlite
+backend/database/e2e.sqlite-journal
+
+# Editor directories
+.vscode
+.idea
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Test artifacts
+playwright-report
+test-results
+*.timestamp-*
