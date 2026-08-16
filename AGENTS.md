@@ -59,3 +59,8 @@ npm run test:e2e:ui                   # Playwright UI mode
 - `e2e/playwright.config.ts` starts both servers on isolated ports (`8010` and `5273`) and seeds a fresh SQLite database.
 - The browser is forced to `Europe/Moscow` timezone and `ru-RU` locale.
 - Do not edit `hexlet-check.yml`.
+
+## Release automation
+
+- Release PRs are created by the `release-please` GitHub Actions workflow.
+- For the workflow to work, the repository must allow GitHub Actions to create and approve pull requests (`Settings → Actions → General → Workflow permissions`).
