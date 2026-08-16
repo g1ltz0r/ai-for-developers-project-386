@@ -3,7 +3,7 @@
 
 ## Demo
 
-Приложение развёрнуто на Railway: https://<your-service>.up.railway.app/
+Приложение развёрнуто на Railway: https://calendar-booking-production-64a3.up.railway.app/
 
 ## Deployment
 
@@ -18,11 +18,10 @@ docker run -p 8080:8080 -e PORT=8080 calendar-booking
 
 ```bash
 railway login
-railway create project
-railway create service
+railway init --name "calendar-booking"
+railway add --service "calendar-booking"
 railway volume create --mount-path /var/www/html/backend/database/storage
+railway variable set APP_KEY="<your-app-key>"
 railway up
 railway domain
 ```
-
-После деплоя добавьте ссылку в раздел `Demo` выше.
