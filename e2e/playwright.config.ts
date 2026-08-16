@@ -1,6 +1,5 @@
 import { defineConfig, devices } from '@playwright/test';
-import { backendDir, frontendDir } from './lib/paths.js';
-import { baseEnv, generateAppKey } from './lib/env.js';
+import { e2eDir, frontendDir } from './lib/paths.js';
 
 export default defineConfig({
   testDir: './tests',
@@ -27,18 +26,13 @@ export default defineConfig({
       use: { ...devices['Desktop Chrome'] },
     },
   ],
-  globalSetup: './global-setup.ts',
   webServer: [
     {
-      command: 'php artisan serve --host=127.0.0.1 --port=8010',
-      cwd: backendDir,
+      command: 'node lib/start-backend.mjs',
+      cwd: e2eDir,
       url: 'http://127.0.0.1:8010/api/event-types',
       timeout: 120_000,
       reuseExistingServer: false,
-      env: {
-        ...baseEnv,
-        APP_KEY: generateAppKey(),
-      },
     },
     {
       command: 'npm run dev -- --port 5273 --host 127.0.0.1',

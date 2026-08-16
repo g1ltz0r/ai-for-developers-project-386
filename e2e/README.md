@@ -39,9 +39,9 @@ npm run test:e2e:ui
 
 ## Архитектура
 
-- `playwright.config.ts` — настройки Playwright, запуск двух `webServer` (backend на `:8010`, frontend на `:5273`) и `global-setup.ts` для миграций и сидинга.
-- `lib/paths.ts` и `lib/env.ts` — пути проекта и единое окружение для тестового SQLite.
-- `global-setup.ts` — перед прогоном создаёт чистую тестовую БД, прогоняет миграции и запускает `E2eSeeder`.
+- `playwright.config.ts` — настройки Playwright, запуск двух `webServer` (backend на `:8010`, frontend на `:5273`).
+- `lib/paths.ts` — пути проекта.
+- `lib/start-backend.mjs` — перед стартом сервера создаёт чистую тестовую БД, прогоняет миграции и запускает `E2eSeeder`.
 - `tests/booking.spec.ts` — покрывает S1 и S2 в одном сквозном тесте.
 
 ## Примечания
